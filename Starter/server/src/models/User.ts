@@ -94,11 +94,21 @@ User.init(
     hooks: {
       // TODO: Add beforeCreate hook to hash password
       // Hint: Check if password exists and hash it with bcrypt
-      // async beforeCreate(user: User) { ... }
+      beforeCreate: async (user: User) => {
+        const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10')
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds)
+        user.password = hashedPassword
+        console.log('Password hashed in beforeCreate')
+      },
 
       // TODO: Add beforeUpdate hook to hash password if changed
       // Hint: Use user.changed('password') to check if password was modified
-      // async beforeUpdate(user: User) { ... }
+      beforeUpdate: async (user: User) => {
+        const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10')
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds)
+        user.password = hashedPassword
+        console.log('Password hashed in beforeUpdate')
+      }
     }
   }
 );
