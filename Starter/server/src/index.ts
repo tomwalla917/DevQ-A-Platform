@@ -50,7 +50,7 @@ const startServer = async () => {
    await testConnection();
 
   // TODO: Sync database (creates tables if they don't exist)
-   WARNING: { force: true } will DROP all tables!
+  // WARNING: { force: true } will DROP all tables!
    await sequelize.sync({ force: false, alter: true });
    console.log('✅ Database synced');
 
