@@ -18,6 +18,13 @@ router.post('/register', async (req: Request, res: Response) => {
       email
     })
   // If missing fields, return 400 with message
+  const token = jwt.sign(
+     { id: user.id, email: user.email, username: user.username },
+     process.env.JWT_SECRET!,
+     { expiresIn: '7d' }
+   );
+
+   res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
   }
   catch (error:any) {
     console.error('error creating new user:', error.message)
@@ -45,17 +52,13 @@ router.post('/register', async (req: Request, res: Response) => {
 
   // TODO: Create the user
   // Remember: Password hashing happens in the model hook!
-  // const user = await User.create({ username, email, password });
+   
 
   // TODO: Generate JWT token
-  // const token = jwt.sign(
-  //   { id: user.id, email: user.email, username: user.username },
-  //   process.env.JWT_SECRET!,
-  //   { expiresIn: '7d' }
-  // );
+   
 
   // TODO: Return token and user data (exclude password!)
-  // res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+   
   
 });
 
