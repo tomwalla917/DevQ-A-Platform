@@ -8,14 +8,40 @@ const router = Router();
 
 // TODO: POST /api/auth/register - Register a new user
 router.post('/register', async (req: Request, res: Response) => {
+  try{
   // TODO: Get username, email, password from req.body
-
+    const { username, email, password} = req.body
   // TODO: Validate input (all fields required)
+    const user = await User.create ({
+      username, 
+      password, 
+      email
+    })
   // If missing fields, return 400 with message
+  }
+  catch (error:any) {
+    console.error('error creating new user:', error.message)
 
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: 'validation failed', 
+        details: error.errors.map((err: any) => ({
+          field: err.path, 
+          message: err.message
+        }))
+      })
+    }
+  
   // TODO: Check if user already exists (by email or username)
   // Use User.findOne({ where: { ... } })
   // If exists, return 400 with message "User already exists"
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({
+        error: 'User already exists'
+      })
+    }
+       res.status(500).json({ error: 'Failed to create user' })
+  }
 
   // TODO: Create the user
   // Remember: Password hashing happens in the model hook!
@@ -30,6 +56,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
   // TODO: Return token and user data (exclude password!)
   // res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+  
 });
 
 // TODO: POST /api/auth/login - Login user

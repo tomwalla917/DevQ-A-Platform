@@ -1,37 +1,54 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-// TODO: Define the JWT payload interface
+// Define the JWT payload interface
 interface JwtPayload {
-  // TODO: Add user properties (id, email, username)
+  id: number;
+  email: string;
+  username: string;
 }
 
-// TODO: Extend Express Request to include user
+// Extend Express Request to include user
 declare global {
   namespace Express {
     interface Request {
-      // TODO: Add user property
-      // user?: { id: number; email: string; username: string };
+      user?: { id: number; email: string; username: string };
     }
   }
 }
 
-// TODO: Create the authenticate middleware
+// Create the authenticate middleware
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-  // TODO: Get token from Authorization header
-  // Hint: const authHeader = req.headers.authorization;
+  // Get token from Authorization header
+  const authHeader = req.headers.authorization;
 
-  // TODO: Check if token exists
-  // If no token, return 401 with message "No token provided"
+  // Check if token exists
+  if (!authHeader) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
 
-  // TODO: Extract token from "Bearer TOKEN" format
-  // Hint: const token = authHeader.split(' ')[1];
+  // Extract token from "Bearer TOKEN" format
+  const token = authHeader.split(' ')[1];
 
-  // TODO: Verify and decode the token
-  // Use try-catch block
-  // jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
 
-  // TODO: If verification fails, return 401 with message "Invalid token"
-
-  // TODO: If successful, attach user info to req.user and call next()
+  // Verify and decode the token
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    
+    // Attach user info to req.user
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      username: decoded.username
+    };
+    
+    // Call next middleware
+    next();
+  } catch (error) {
+    // If verification fails, return 401
+    return res.status(401).json({ message: 'Invalid token' });
+  }
 };
